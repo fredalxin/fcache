@@ -115,12 +115,16 @@ func (c *Cache) Update(k string, v interface{}, d time.Duration) error {
 
 func (c *Cache) Inc(k string, n int64) error {
 	c.mu.Lock()
-	_, ok := c.get(k)
+	num, ok := c.get(k)
 	if !ok {
 		c.mu.Lock()
 		return fmt.Errorf("Item %s doesn't exist", k)
 	}
-	//c.set(k, v, d)
+	on, ok := num.(int64)
+	if !ok {
+		return fmt.Errorf("Item %s is not int", n)
+	}
+	c.set(k, on+n, DefaultExpiration)
 	c.mu.Unlock()
 	return nil
 }
